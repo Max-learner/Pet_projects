@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head> 
+    <title th:text="${title}">Главная страница</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/careerblog/static/style.css">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    
+</head>
+
+<body>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous"></script>
+	
+	<header th:insert="blocks/header :: header"></header>
+	
+	<div class="container mt-5">
+		<div class="mb3">
+			<div>
+				<form th:action="@{/blog-edit}" method="get" class="row row-cols-lg-auto g-3 align-items-center">
+					<div class="col-sm-6">
+						<input type="text" name="filter" th:value="${filter}" class="form-control" placeholder="#тэг"/>
+					</div>
+					<div class="col-sm-6">
+						<button type="submit" class="btn btn-primary">Искать сообщения по тэгу</button>
+					</div>
+					<div class="col-sm-6">
+						<button class="btn btn-primary" type="button" 
+						data-bs-toggle="collapse" data-bs-target="#collapseExample" 
+						aria-expanded="false" aria-controls="collapseExample">
+						    Добавить новое сообщение
+						 </button>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div id="collapseExample" class="collapse" th:classappend="${(message != null) ? 'show' : ''}">
+			<div class="mt-3">
+				<form th:action="@{/blog-edit}" method="post" th:object="${message}" enctype="multipart/form-data">
+					<div>
+						<input type="text" name="text" class="form-control" placeholder="Введите сообщение"
+							th:field="*{text}" th:errorclass="is-invalid"/>
+						<div th:if="${textError}" th:classappend="${(textError != null) ? 'invalid-feedback' : ''}">
+							<p th:text="${textError}"></p>
+						</div>
+					</div>
+						<input type="text" name="tag" class="form-control mt-3" placeholder="Тэги"
+						th:field="*{tag}" th:errorclass="is-invalid"/> 
+						<div th:if="${errorsMap}" th:classappend="${(errorsMap != null) ? 'invalid-feedback' : ''}">
+							<p th:text="${errorsMap.get('tagError')}"></p>
+						</div>
+					<div class="mb-3">
+					  <label for="file"  class="form-label mt-3">Загрузить файл</label>
+					  <input class="form-control" name="file" type="file" id="file">
+					</div>
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+					<button type="submit" class="btn btn-primary">Добавить сообщение </button>
+				</form>
+			</div>
+		</div>
+
+		<div class="mt-3">
+			<div class="row row-cols-1 row-cols-md-2 g-4 mt-3">
+				<div th:each="el : ${messages}" class="card m-3"
+					style="width: 18rem;">
+					<div th:if="${el.filename}">
+						<img alt="Картинка для сообщения"
+							th:src="@{'/img/' + ${el.filename}}" class="card-img-top mt-2">
+					</div>
+					<div class="card-body">
+						<h5 class="card-title">Card title</h5>
+						<p th:text="${el.text}"></p>
+						<p th:text="${el.tag}"></p>
+					</div>
+					<div class="card-footer"
+						th:text="@{'posted by: ' + ${el.getAuthorName()}}"></div>
+	
+					<form th:action="@{'/edit/' + ${el.id}}" method="get">
+						<button type="submit" class="btn btn-warning">Редактировать сообщение</button>
+					</form>	
+					<form th:action="@{'/remove/' + ${el.id}}" method="post">
+						<button type="submit" class="btn btn-warning">Удалить сообщение</button>
+					</form>	
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
